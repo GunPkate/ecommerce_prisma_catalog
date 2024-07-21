@@ -80,7 +80,7 @@ export default function Index(){
         for (let i = 0; i < data.length; i++) {
             sum += data[i].price;
         } 
-        setSumPrice(sum)
+        setSumPrice(sum.toLocaleString('th-TH'))
         setSumQty(data.length)
     }
 
@@ -102,7 +102,7 @@ export default function Index(){
                         {showImage(x)}
                         <div className="card-body">
                             <div>{x.name}</div>
-                            <div>{x.price}</div>
+                            <div>{x.price.toLocaleString('th-TH')}</div>
                         </div>
                         <div className="text-center">
                             <button onClick={(e)=>addToCart(x)} className="btn btn-primary mb-4"><i className="mr-3 fa fa-shopping-cart"></i>Add to Cart</button>
@@ -117,31 +117,79 @@ export default function Index(){
             <div>Items</div>
             <table className="table table-striped mt-2">
                 <thead className="thead-dark">
-                <tr >
-                    <th className="col-4 text-center">Name</th>
-                    <th className="col-3 text-center">Price</th>
-                    <th className="col-2 text-center ">Qty</th>
-                    <th className="col-3 text-center">Action</th>
-                </tr>
+                    <tr >
+                        <th className="col-4 text-center">Name</th>
+                        <th className="col-3 text-center">Price</th>
+                        <th className="col-2 text-center ">Qty</th>
+                        <th className="col-3 text-center">Action</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {cart?cart.map( (x,i)=>{
-                    return <tr key={i}>
-                        <td>{x.name}</td>
-                        <td className="text-right ">{x.price}</td>
-                        <td className="text-right ">{1} </td>
-                        <td className="text-right ">
-                            <button className="btn btn-danger" onClick={(e)=>{removeFromCart(i)}}><i className="fa fa-times"></i></button>
+                    {cart?cart.map( (x,i)=>{
+                        return <tr key={i}>
+                            <td>{x.name}</td>
+                            <td className="text-right ">{x.price.toLocaleString('th-TH')}</td>
+                            <td className="text-right ">{1} </td>
+                            <td className="text-right ">
+                                <button className="btn btn-danger" onClick={(e)=>{removeFromCart(i)}}><i className="fa fa-times"></i></button>
+                            </td>
+                            
+                        </tr>
+                    }):<></>}
+
+
+                    <tr>
+                        <td >
+                            Name
                         </td>
-                        
+                        <td colSpan={3}>
+                            <input />
+                        </td>
                     </tr>
-                }):<></>}
-                <tr>
-                    <td > Total </td>
-                    <td className="text-right">{sumPrice}</td>
-                    <td className="text-right">{sumQty}</td>
-                </tr>
+                    <tr>
+                        <td >
+                            Adress
+                        </td>
+                        <td colSpan={3}>
+                            <input />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            Tell NO
+                        </td>
+                        <td colSpan={3}>
+                            <input />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            Transaction Date
+                        </td>
+                        <td colSpan={3}>
+                            <input />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            Time
+                        </td>
+                        <td colSpan={3}>
+                            <input />
+                        </td>
+                    </tr>
+
+                    <tr className="">
+                        <td > Total </td>
+                        <td className="text-right">{sumPrice}</td>
+                        <td className="text-right">{sumQty}</td>
+                        <td className="text-right">
+                            <button className="btn btn-success">Order</button>
+                        </td>
+                    </tr>
                 </tbody>
+
+ 
             </table>
         </Modal>
     </>
