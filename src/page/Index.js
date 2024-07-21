@@ -2,13 +2,17 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import config from "../config"
 import Swal from "sweetalert2"
+import Modal from "../component/modal"
 
 export default function Index(){
-    const [products,setProducts] = useState()
+    const [products,setProducts] = useState([])
     const [cart,setCart] = useState([]);
     const [cartNum,setCartNum] = useState(0);
 
-    useEffect(() => { fetchData() },[])
+    useEffect(() => { 
+        fetchData();
+        fetchDataLocal();
+    },[])
 
     const fetchData = async () => {
 
@@ -28,9 +32,14 @@ export default function Index(){
 
     function addToCart(product){
         let arr = cart
+        console.log(arr)
+        if(arr == null){
+            arr = []
+        }
         arr.push(product)
         setCart(arr)
         setCartNum(arr.length)
+        localStorage.setItem('carts',JSON.stringify(cart))
     }
 
     const showImage = (product, fixWidth) => {
@@ -39,12 +48,33 @@ export default function Index(){
         :<img alt="no img" src={'no_data.jpg'}/>     
     }
 
+    const fetchDataLocal = () => {
+        const itemsChart = JSON.parse(localStorage.getItem('carts'))
+        console.log(itemsChart)
+        if(itemsChart !== null ){
+
+            setCart(itemsChart);
+            setCartNum( itemsChart?itemsChart.length: 0)
+        }else{
+            setCart([])
+        }
+    }
+
+    const removeFromCart = (num) => {
+        let temp = cart;
+        temp.splice(num,1)
+        console.log(temp)
+        setCart(temp);
+        setCartNum(temp.length)
+        localStorage.setItem('carts',JSON.stringify(temp))
+    }
+
     return <>
         <div className="container">
             <div className="row">
                 <div className="col-6 my-auto"> Product Catalog </div>
                 <div className="col-6 text-right"> 
-                    <button className="btn btn-outline-success">
+                    <button className="btn btn-outline-success" data-toggle="modal" data-target="#modalCart">
                         <i className="fa fa-shopping-cart"></i>
                         {cartNum} 
                     </button>
@@ -67,5 +97,32 @@ export default function Index(){
             }):<> No Data </>}
             </div>
         </div>
+
+        <Modal id="modalCart" title="Cart">
+            <div>Items</div>
+            <table className="table table-striped mt-2">
+                <thead className="thead-dark">
+                <tr >
+                    <th className="col-4 text-center">Name</th>
+                    <th className="col-3 text-center">Price</th>
+                    <th className="col-2 text-center ">Qty</th>
+                    <th className="col-3 text-center">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {cart?cart.map( (x,i)=>{
+                    return <tr key={i}>
+                        <td>{x.name}</td>
+                        <td className="text-right">{x.price}</td>
+                        <td className="text-right">{1}</td>
+                        <td className="text-right">
+                            <button className="btn btn-danger" onClick={(e)=>{removeFromCart(i)}}><i className="fa fa-times"></i></button>
+                        </td>
+                        
+                    </tr>
+                }):<></>}
+                </tbody>
+            </table>
+        </Modal>
     </>
 }
