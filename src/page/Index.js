@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import config from "../config"
 import Swal from "sweetalert2"
 import Modal from "../component/modal"
+import dayjs from "dayjs"
 
 export default function Index(){
     const [products,setProducts] = useState([])
@@ -10,10 +11,15 @@ export default function Index(){
     const [cartNum,setCartNum] = useState(0);
     const [sumPrice,setSumPrice] = useState(0);
     const [sumQty,setSumQty] = useState(0);
+    const [formData,setFormData] = useState({
+        date: dayjs(new Date()).format('YYYY-MM-DD'),
+        
+    });
 
     useEffect(() => { 
         fetchData();
         fetchDataLocal();
+        setFormData({...formData,time: getNewTime()})
     },[])
 
     const fetchData = async () => {
@@ -42,6 +48,14 @@ export default function Index(){
         setCart(arr)
         setCartNum(arr.length)
         localStorage.setItem('carts',JSON.stringify(cart))
+
+        sumCart(arr)
+        setFormData({...formData,time: getNewTime()})
+    }
+
+    const getNewTime = () =>{
+        let newDate = new Date()+'';
+        return newDate.split(' ')[4];
     }
 
     const showImage = (product, fixWidth) => {
@@ -73,6 +87,7 @@ export default function Index(){
         localStorage.setItem('carts',JSON.stringify(temp))
 
         sumCart(temp)
+        setFormData({...formData,time: getNewTime()})
     }
 
     const sumCart = (data) => {
@@ -82,6 +97,10 @@ export default function Index(){
         } 
         setSumPrice(sum.toLocaleString('th-TH'))
         setSumQty(data.length)
+    }
+
+    function handleOrder(){
+        console.log(formData)
     }
 
     return <>
@@ -114,7 +133,6 @@ export default function Index(){
         </div>
 
         <Modal id="modalCart" title="Cart">
-            <div>Items</div>
             <table className="table table-striped mt-2">
                 <thead className="thead-dark">
                     <tr >
@@ -143,7 +161,7 @@ export default function Index(){
                             Name
                         </td>
                         <td colSpan={3}>
-                            <input />
+                            <input onChange={(e) => {setFormData({...formData, name: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -151,7 +169,7 @@ export default function Index(){
                             Adress
                         </td>
                         <td colSpan={3}>
-                            <input />
+                            <input onChange={(e) => {setFormData({...formData, address: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -159,7 +177,7 @@ export default function Index(){
                             Tell NO
                         </td>
                         <td colSpan={3}>
-                            <input />
+                            <input onChange={(e) => {setFormData({...formData, tel: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -167,7 +185,7 @@ export default function Index(){
                             Transaction Date
                         </td>
                         <td colSpan={3}>
-                            <input />
+                            <input value={formData.date} type="date" onChange={(e) => {setFormData({...formData, date: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -175,7 +193,7 @@ export default function Index(){
                             Time
                         </td>
                         <td colSpan={3}>
-                            <input />
+                            <input value={formData.time} onChange={(e) => {setFormData({...formData, time: e.target.value })}}/>
                         </td>
                     </tr>
 
@@ -184,7 +202,7 @@ export default function Index(){
                         <td className="text-right">{sumPrice}</td>
                         <td className="text-right">{sumQty}</td>
                         <td className="text-right">
-                            <button className="btn btn-success">Order</button>
+                            <button className="btn btn-success" onClick={handleOrder}>Order</button>
                         </td>
                     </tr>
                 </tbody>
