@@ -8,6 +8,8 @@ export default function Index(){
     const [products,setProducts] = useState([])
     const [cart,setCart] = useState([]);
     const [cartNum,setCartNum] = useState(0);
+    const [sumPrice,setSumPrice] = useState(0);
+    const [sumQty,setSumQty] = useState(0);
 
     useEffect(() => { 
         fetchData();
@@ -50,16 +52,18 @@ export default function Index(){
 
     const fetchDataLocal = () => {
         const itemsChart = JSON.parse(localStorage.getItem('carts'))
-        console.log(itemsChart)
+
         if(itemsChart !== null ){
 
             setCart(itemsChart);
             setCartNum( itemsChart?itemsChart.length: 0)
+            sumCart(itemsChart)
         }else{
             setCart([])
         }
-    }
 
+    }
+ 
     const removeFromCart = (num) => {
         let temp = cart;
         temp.splice(num,1)
@@ -67,6 +71,17 @@ export default function Index(){
         setCart(temp);
         setCartNum(temp.length)
         localStorage.setItem('carts',JSON.stringify(temp))
+
+        sumCart(temp)
+    }
+
+    const sumCart = (data) => {
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+            sum += data[i].price;
+        } 
+        setSumPrice(sum)
+        setSumQty(data.length)
     }
 
     return <>
@@ -113,14 +128,19 @@ export default function Index(){
                 {cart?cart.map( (x,i)=>{
                     return <tr key={i}>
                         <td>{x.name}</td>
-                        <td className="text-right">{x.price}</td>
-                        <td className="text-right">{1}</td>
-                        <td className="text-right">
+                        <td className="text-right ">{x.price}</td>
+                        <td className="text-right ">{1} </td>
+                        <td className="text-right ">
                             <button className="btn btn-danger" onClick={(e)=>{removeFromCart(i)}}><i className="fa fa-times"></i></button>
                         </td>
                         
                     </tr>
                 }):<></>}
+                <tr>
+                    <td > Total </td>
+                    <td className="text-right">{sumPrice}</td>
+                    <td className="text-right">{sumQty}</td>
+                </tr>
                 </tbody>
             </table>
         </Modal>
