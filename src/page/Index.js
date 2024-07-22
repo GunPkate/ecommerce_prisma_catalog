@@ -12,14 +12,14 @@ export default function Index(){
     const [sumPrice,setSumPrice] = useState(0);
     const [sumQty,setSumQty] = useState(0);
     const [formData,setFormData] = useState({
-        date: dayjs(new Date()).format('YYYY-MM-DD'),
+        payDate: dayjs(new Date()).format('YYYY-MM-DD'),
         
     });
 
     useEffect(() => { 
         fetchData();
         fetchDataLocal();
-        setFormData({...formData,time: getNewTime()})
+        setFormData({...formData,payTime: getNewTime()})
     },[])
 
     const fetchData = async () => {
@@ -50,7 +50,7 @@ export default function Index(){
         localStorage.setItem('carts',JSON.stringify(cart))
 
         sumCart(arr)
-        setFormData({...formData,time: getNewTime()})
+        setFormData({...formData,payTime: getNewTime()})
     }
 
     const getNewTime = () =>{
@@ -87,7 +87,7 @@ export default function Index(){
         localStorage.setItem('carts',JSON.stringify(temp))
 
         sumCart(temp)
-        setFormData({...formData,time: getNewTime()})
+        setFormData({...formData,payTime: getNewTime()})
     }
 
     const sumCart = (data) => {
@@ -99,8 +99,31 @@ export default function Index(){
         setSumQty(data.length)
     }
 
-    function handleOrder(){
-        console.log(formData)
+    async function handleOrder(){
+        try {
+            console.log(formData)
+            const res = await axios.post(config.apiPath+'/sale/order',formData)
+            const resDetail = await axios.post(config.apiPath+'/sale/orderDetail',cart)
+            if(res.data.message=== 'success' && resDetail.data.message === 'success'){
+                localStorage.removeItem('carts');
+                setCartNum(0);
+                setCart([]);
+    
+                Swal.fire({
+                    title: 'Order Submit',
+                    text: 'Success',
+                    timer: 2000,
+                    icon: 'info'
+                })
+            }  
+        } catch (e) {
+            Swal.fire({
+                title: 'Error',
+                text: e.message,
+                icon: 'error'
+            })
+        }
+
     }
 
     return <>
@@ -161,7 +184,7 @@ export default function Index(){
                             Name
                         </td>
                         <td colSpan={3}>
-                            <input onChange={(e) => {setFormData({...formData, name: e.target.value })}}/>
+                            <input onChange={(e) => {setFormData({...formData, customerName: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -177,7 +200,7 @@ export default function Index(){
                             Tell NO
                         </td>
                         <td colSpan={3}>
-                            <input onChange={(e) => {setFormData({...formData, tel: e.target.value })}}/>
+                            <input onChange={(e) => {setFormData({...formData, customerPhone: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -185,7 +208,7 @@ export default function Index(){
                             Transaction Date
                         </td>
                         <td colSpan={3}>
-                            <input value={formData.date} type="date" onChange={(e) => {setFormData({...formData, date: e.target.value })}}/>
+                            <input value={formData.payDate} type="date" onChange={(e) => {setFormData({...formData, payDate: e.target.value })}}/>
                         </td>
                     </tr>
                     <tr>
@@ -193,7 +216,7 @@ export default function Index(){
                             Time
                         </td>
                         <td colSpan={3}>
-                            <input value={formData.time} onChange={(e) => {setFormData({...formData, time: e.target.value })}}/>
+                            <input value={formData.payTime} onChange={(e) => {setFormData({...formData, payTime: e.target.value })}}/>
                         </td>
                     </tr>
 
