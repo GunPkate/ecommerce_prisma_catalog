@@ -125,6 +125,13 @@ export default function Index(){
                 
             }  
             document.getElementById('modalCart').click(); 
+            setFormData({...formData,
+                customerName: '',
+                customerPhone: '',
+                address: '',
+                payTime: getNewTime(),
+                payDate: dayjs(new Date()).format('YYYY-MM-DD')
+            })
         } catch (e) {
             Swal.fire({
                 title: 'Error',
