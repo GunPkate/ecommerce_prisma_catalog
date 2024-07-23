@@ -12,8 +12,11 @@ export default function Index(){
     const [sumPrice,setSumPrice] = useState(0);
     const [sumQty,setSumQty] = useState(0);
     const [formData,setFormData] = useState({
+        customerName: '',
+        customerPhone: '',
+        address: '',
         payDate: dayjs(new Date()).format('YYYY-MM-DD'),
-        
+        payTime: ''
     });
 
     useEffect(() => { 
@@ -102,12 +105,16 @@ export default function Index(){
     async function handleOrder(){
         try {
             console.log(formData)
-            const res = await axios.post(config.apiPath+'/sale/order',formData)
-            const resDetail = await axios.post(config.apiPath+'/sale/orderDetail',cart)
-            if(res.data.message=== 'success' && resDetail.data.message === 'success'){
+            console.log(cart)
+            let tempForm = {...formData,cart}
+            const res = await axios.post(config.apiPath+'/sale/order',tempForm)
+
+            if(res.data.message=== 'success'){
                 localStorage.removeItem('carts');
                 setCartNum(0);
                 setCart([]);
+                setSumPrice(0);
+                setSumQty(0)
     
                 Swal.fire({
                     title: 'Order Submit',
@@ -115,7 +122,9 @@ export default function Index(){
                     timer: 2000,
                     icon: 'info'
                 })
+                
             }  
+            document.getElementById('modalCart').click(); 
         } catch (e) {
             Swal.fire({
                 title: 'Error',
@@ -156,6 +165,73 @@ export default function Index(){
         </div>
 
         <Modal id="modalCart" title="Cart">
+            <table>
+                <tbody>
+                <tr>
+                <td className="font-weight-bold">
+                        Name
+                    </td>
+                    <td>
+                        <input onChange={(e) => {setFormData({...formData, customerName: e.target.value })}}/>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody >
+                <tr>
+                <td className="font-weight-bold">
+                        Adress
+                    </td>
+                    <td >
+                        <input onChange={(e) => {setFormData({...formData, address: e.target.value })}}/>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td className="font-weight-bold">
+                        Tell NO
+                    </td>
+                        <td>
+                        <input onChange={(e) => {setFormData({...formData, customerPhone: e.target.value })}}/>
+                        </td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                <td className="font-weight-bold">
+                        Transaction Date
+                    </td>
+                        <td>
+                        <input value={formData.payDate} type="date" onChange={(e) => {setFormData({...formData, payDate: e.target.value })}}/>
+                        </td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                <td className="font-weight-bold">
+                        Time
+                    </td>
+                        <td>
+                        <input value={formData.payTime} onChange={(e) => {setFormData({...formData, payTime: e.target.value })}}/>
+                        </td>
+                </tr>
+                </tbody>
+
+
+
+            </table>
+            <table className="table table-striped mt-2">
+                <thead className="thead-dark">
+                    <tr >
+                        <th className="col-4 text-center align-middle">Total</th>
+                        <th className="col-3 text-center align-middle">{sumPrice}</th>
+                        <th className="col-2 text-center align-middle">{sumQty}</th>
+                        <th className="col-3 text-center align-middle">                      
+                            <button className="btn btn-success" onClick={handleOrder}>Order</button>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
             <table className="table table-striped mt-2">
                 <thead className="thead-dark">
                     <tr >
@@ -179,55 +255,6 @@ export default function Index(){
                     }):<></>}
 
 
-                    <tr>
-                        <td >
-                            Name
-                        </td>
-                        <td colSpan={3}>
-                            <input onChange={(e) => {setFormData({...formData, customerName: e.target.value })}}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td >
-                            Adress
-                        </td>
-                        <td colSpan={3}>
-                            <input onChange={(e) => {setFormData({...formData, address: e.target.value })}}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td >
-                            Tell NO
-                        </td>
-                        <td colSpan={3}>
-                            <input onChange={(e) => {setFormData({...formData, customerPhone: e.target.value })}}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td >
-                            Transaction Date
-                        </td>
-                        <td colSpan={3}>
-                            <input value={formData.payDate} type="date" onChange={(e) => {setFormData({...formData, payDate: e.target.value })}}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td >
-                            Time
-                        </td>
-                        <td colSpan={3}>
-                            <input value={formData.payTime} onChange={(e) => {setFormData({...formData, payTime: e.target.value })}}/>
-                        </td>
-                    </tr>
-
-                    <tr className="">
-                        <td > Total </td>
-                        <td className="text-right">{sumPrice}</td>
-                        <td className="text-right">{sumQty}</td>
-                        <td className="text-right">
-                            <button className="btn btn-success" onClick={handleOrder}>Order</button>
-                        </td>
-                    </tr>
                 </tbody>
 
  
